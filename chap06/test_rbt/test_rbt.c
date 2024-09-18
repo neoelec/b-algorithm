@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
         printf("\n(2) Remove a node");
         printf("\n(3) Search a node");
         printf("\n(4) Print Forward");
-        printf("\n(5) Print Reverse");
+        printf("\n(5) Print Backward");
         printf("\n(6) Print Inorder");
         printf("\n(7) Print Preorder");
         printf("\n(8) Print Postorder");
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
             break;
 
         case 5:
-            RBT_Reverse(tree, RBT_PrintEntry, NULL);
+            RBT_Backward(tree, RBT_PrintEntry, NULL);
             break;
 
         case 6:
