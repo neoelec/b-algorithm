@@ -1,8 +1,9 @@
 #include <stdio.h>
 
-#include "score.h"
 #include <algorithm/linearsearch.h>
 #include <algorithm/quicksort.h>
+
+#include "score.h"
 
 static int Compare(const void *_elem1, const void *_elem2)
 {
