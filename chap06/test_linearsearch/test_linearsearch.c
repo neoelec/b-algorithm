@@ -25,13 +25,8 @@ int main(int argc, char *argv[])
     };
     struct Score *found;
     size_t nmemb = SCORE_NrData();
-    void *ptr_arr[nmemb];
-    size_t i;
 
-    for (i = 0; i < nmemb; i++)
-        ptr_arr[i] = &score_data_set[i];
-
-    found = LinearSearch(&key, ptr_arr, nmemb, Compare);
+    found = LinearSearch(&key, score_data_set, nmemb, sizeof(key), Compare);
 
     printf("found: %u %f\n", found->number, found->score);
 
