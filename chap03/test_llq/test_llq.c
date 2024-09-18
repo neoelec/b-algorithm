@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
     while (!LLQ_IsEmpty(queue)) {
         entry = LLQ_DequeueEntry(queue);
         printf("Dequeue: %s\n", entry->data);
+        free(entry);
     }
 
     LLQ_DestroyQueue(queue);
