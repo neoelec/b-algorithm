@@ -20,12 +20,16 @@ static struct LLS_Entry *LLS_PushEntry(struct LLS *stack, const char *data)
 
 static struct LLS_Entry *LLS_PopEntry(struct LLS *stack)
 {
-    return CONTAINER_OF(LLS_Pop(stack), struct LLS_Entry, node);
+    struct SLL_Node *node = LLS_Pop(stack);
+
+    return CONTAINER_OF(node, struct LLS_Entry, node);
 }
 
 static struct LLS_Entry *LLS_TopEntry(struct LLS *stack)
 {
-    return CONTAINER_OF(LLS_Top(stack), struct LLS_Entry, node);
+    struct SLL_Node *node = LLS_Top(stack);
+
+    return CONTAINER_OF(node, struct LLS_Entry, node);
 }
 
 static struct LLS *LLS_CreateStack(void)
@@ -47,10 +51,8 @@ static void LLS_DestroyStack(struct LLS *stack)
 
 int main(int argc, char *argv[])
 {
-    size_t i;
     size_t count;
     struct LLS *stack = LLS_CreateStack();
-    struct LLS_Entry *popped;
 
     LLS_PushEntry(stack, "abc");
     LLS_PushEntry(stack, "def");
@@ -60,19 +62,18 @@ int main(int argc, char *argv[])
     count = LLS_Count(stack);
     printf("Count: %zu, Top: %s\n\n", count, LLS_TopEntry(stack)->data);
 
-    for (i = 0; i < count; i++) {
-        if (LLS_IsEmpty(stack))
-            break;
+    while (1) {
+        struct LLS_Entry *popped = LLS_PopEntry(stack);
 
-        popped = LLS_PopEntry(stack);
         printf("Popped: %s, ", popped->data);
-
         free(popped);
 
         if (!LLS_IsEmpty(stack)) {
             printf("Current Top: %s\n", LLS_TopEntry(stack)->data);
-        } else
+        } else {
             printf("Stack Is Empty.\n");
+            break;
+        }
     }
 
     LLS_DestroyStack(stack);
