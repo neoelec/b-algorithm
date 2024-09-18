@@ -13,6 +13,18 @@ static int *AS_PushEntry(struct AS *stack, int data)
     return entry;
 }
 
+static int AS_PopEntry(struct AS *stack)
+{
+    int *entry = AS_Pop(stack);
+    int data = *entry;
+
+    free(entry);
+
+    return data;
+}
+
+static int AS_TopEntry(struct AS *stack) { return *(int *)AS_Top(stack); }
+
 static struct AS *AS_CreateStack(size_t nr_entries)
 {
     struct AS *stack = malloc(AS_BYTES(nr_entries));
@@ -25,7 +37,7 @@ static struct AS *AS_CreateStack(size_t nr_entries)
 static void AS_DestroyStack(struct AS *stack)
 {
     while (!AS_IsEmpty(stack))
-        free(AS_Pop(stack));
+        AS_PopEntry(stack);
 
     free(stack);
 }
@@ -41,16 +53,16 @@ int main(int argc, char *argv[])
     AS_PushEntry(stack, 12);
 
     printf("Capacity: %zu, Count: %zu, Top: %d\n\n", stack->nr_entries,
-        AS_Count(stack), *(int *)AS_Top(stack));
+        AS_Count(stack), AS_TopEntry(stack));
 
     for (i = 0; i < 4; i++) {
         if (AS_IsEmpty(stack))
             break;
 
-        printf("Popped: %d, ", *(int *)AS_Pop(stack));
+        printf("Popped: %d, ", AS_PopEntry(stack));
 
         if (!AS_IsEmpty(stack))
-            printf("Current Top: %d\n", *(int *)AS_Top(stack));
+            printf("Current Top: %d\n", AS_TopEntry(stack));
         else
             printf("Stack Is Empty.\n");
     }
