@@ -3,14 +3,22 @@
 
 #include <container/cq.h>
 
-static int *CQ_EnqueueEntry(struct CQ *queue, int data)
+static void CQ_EnqueueEntry(struct CQ *queue, int data)
 {
     int *entry = malloc(sizeof(*entry));
 
     *entry = data;
     CQ_Enqueue(queue, entry);
+}
 
-    return entry;
+static int CQ_DequeueEntry(struct CQ *queue)
+{
+    int *entry = CQ_Dequeue(queue);
+    int data = *entry;
+
+    free(entry);
+
+    return data;
 }
 
 static struct CQ *CQ_CreateQueue(size_t nr_entries)
@@ -25,14 +33,14 @@ static struct CQ *CQ_CreateQueue(size_t nr_entries)
 static void CQ_DestroyQueue(struct CQ *queue)
 {
     while (!CQ_IsEmpty(queue))
-        free(CQ_Dequeue(queue));
+        CQ_DequeueEntry(queue);
 
     free(queue);
 }
 
 int main(int argc, char *argv[])
 {
-    size_t i;
+    int i;
     struct CQ *queue = CQ_CreateQueue(10);
 
     CQ_EnqueueEntry(queue, 1);
@@ -41,7 +49,7 @@ int main(int argc, char *argv[])
     CQ_EnqueueEntry(queue, 4);
 
     for (i = 0; i < 3; i++) {
-        printf("Dequeue: %d, ", *(int *)CQ_Dequeue(queue));
+        printf("Dequeue: %d, ", CQ_DequeueEntry(queue));
         printf("Front: %zu, Rear: %zu\n", queue->front, queue->rear);
     }
 
@@ -53,7 +61,7 @@ int main(int argc, char *argv[])
         "Capacity: %zu, Count:  %zu\n\n", queue->nr_entries, CQ_Count(queue));
 
     while (!CQ_IsEmpty(queue)) {
-        printf("Dequeue: %d, ", *(int *)CQ_Dequeue(queue));
+        printf("Dequeue: %d, ", CQ_DequeueEntry(queue));
         printf("Front: %zu, Rear: %zu\n", queue->front, queue->rear);
     }
 
