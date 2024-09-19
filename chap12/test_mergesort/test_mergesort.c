@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     for (i = 0; i < NR_ELEM(data); i++)
         ptr_arr[i] = &data[i];
 
-    MergeSort(ptr_arr, NR_ELEM(data), Compare);
+    MergeSort(ptr_arr, NR_ELEM(data), sizeof(data[0]), Compare);
 
     for (i = 0; i < NR_ELEM(data); i++)
         printf("%d ", *(int *)ptr_arr[i]);
