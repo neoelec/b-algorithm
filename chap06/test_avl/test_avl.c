@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <time.h>
 
 #include <container/avl.h>
 
@@ -16,17 +17,6 @@ static int Compare(const struct AVL_Node *_a, const struct AVL_Node *_b)
 
     return a->data - b->data;
 }
-
-static struct AVL_Entry *AVL_InsertEntry(struct AVL *tree, int data)
-{
-    struct AVL_Entry *entry = malloc(sizeof(*entry));
-
-    entry->data = data;
-    AVL_Insert(tree, &entry->node);
-
-    return entry;
-}
-
 static struct AVL_Entry *AVL_SearchEntry(struct AVL *tree, int data)
 {
     struct AVL_Entry key_entry = {
@@ -38,6 +28,20 @@ static struct AVL_Entry *AVL_SearchEntry(struct AVL *tree, int data)
         return NULL;
 
     return CONTAINER_OF(x, struct AVL_Entry, node);
+}
+
+static struct AVL_Entry *AVL_InsertEntry(struct AVL *tree, int data)
+{
+    struct AVL_Entry *entry;
+
+    if (AVL_SearchEntry(tree, data))
+        return NULL;
+
+    entry = malloc(sizeof(*entry));
+    entry->data = data;
+    AVL_Insert(tree, &entry->node);
+
+    return entry;
 }
 
 static struct AVL_Entry *AVL_RemoveEntry(struct AVL *tree, int data)
@@ -85,19 +89,32 @@ static void AVL_DestroyTree(struct AVL *tree)
     free(tree);
 }
 
+static void AVL_InsertEntriesRandomly(struct AVL *tree)
+{
+    size_t i;
+
+    for (i = 0; i < 100; i++) {
+        if (!AVL_InsertEntry(tree, rand() % 500))
+            i--;
+    }
+}
+
+static void AVL_RemoveEntriesRandomly(struct AVL *tree)
+{
+    struct AVL_Entry *entry;
+
+    while (tree->root) {
+        entry = AVL_RemoveEntry(tree, rand() % 500);
+        if (entry)
+            AVL_DestroyEntry(entry);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     struct AVL *tree = AVL_CreateTree();
 
-    AVL_InsertEntry(tree, 95);
-    AVL_InsertEntry(tree, 87);
-    AVL_InsertEntry(tree, 13);
-    AVL_InsertEntry(tree, 12);
-    AVL_InsertEntry(tree, 15);
-    AVL_InsertEntry(tree, 14);
-    AVL_InsertEntry(tree, 32);
-    AVL_InsertEntry(tree, 123);
-    AVL_InsertEntry(tree, 174);
+    srand(time(NULL));
 
     while (1) {
         unsigned int cmd;
@@ -113,6 +130,8 @@ int main(int argc, char *argv[])
         printf("\n(6) Print Inorder");
         printf("\n(7) Print Preorder");
         printf("\n(8) Print Postorder");
+        printf("\n(10) Create 100 random nodes");
+        printf("\n(11) Remove all nodes randomly");
         printf("\n(0) Quit");
 
         printf("\n\nEnter Your Choice: ");
@@ -165,6 +184,14 @@ int main(int argc, char *argv[])
 
         case 8:
             AVL_Postorder(tree, AVL_PrintEntry, NULL);
+            break;
+
+        case 10:
+            AVL_InsertEntriesRandomly(tree);
+            break;
+
+        case 11:
+            AVL_RemoveEntriesRandomly(tree);
             break;
 
         default:
