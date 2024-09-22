@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <container/rbt.h>
 
@@ -17,16 +18,6 @@ static int Compare(const struct RBT_Node *_a, const struct RBT_Node *_b)
     return a->data - b->data;
 }
 
-static struct RBT_Entry *RBT_InsertEntry(struct RBT *tree, int data)
-{
-    struct RBT_Entry *entry = malloc(sizeof(*entry));
-
-    entry->data = data;
-    RBT_Insert(tree, &entry->node);
-
-    return entry;
-}
-
 static struct RBT_Entry *RBT_SearchEntry(struct RBT *tree, int data)
 {
     struct RBT_Entry key_entry = {
@@ -38,6 +29,20 @@ static struct RBT_Entry *RBT_SearchEntry(struct RBT *tree, int data)
         return NULL;
 
     return CONTAINER_OF(x, struct RBT_Entry, node);
+}
+
+static struct RBT_Entry *RBT_InsertEntry(struct RBT *tree, int data)
+{
+    struct RBT_Entry *entry;
+
+    if (RBT_SearchEntry(tree, data))
+        return NULL;
+
+    entry = malloc(sizeof(*entry));
+    entry->data = data;
+    RBT_Insert(tree, &entry->node);
+
+    return entry;
 }
 
 static struct RBT_Entry *RBT_RemoveEntry(struct RBT *tree, int data)
@@ -129,19 +134,32 @@ static void RBT_DestroyTree(struct RBT *tree)
     free(tree);
 }
 
+static void RBT_InsertEntriesRandomly(struct RBT *tree)
+{
+    size_t i;
+
+    for (i = 0; i < 100; i++) {
+        if (!RBT_InsertEntry(tree, rand() % 500))
+            i--;
+    }
+}
+
+static void RBT_RemoveEntriesRandomly(struct RBT *tree)
+{
+    struct RBT_Entry *entry;
+
+    while (tree->root) {
+        entry = RBT_RemoveEntry(tree, rand() % 500);
+        if (entry)
+            RBT_DestroyEntry(entry);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     struct RBT *tree = RBT_CreateTree();
 
-    RBT_InsertEntry(tree, 95);
-    RBT_InsertEntry(tree, 87);
-    RBT_InsertEntry(tree, 13);
-    RBT_InsertEntry(tree, 12);
-    RBT_InsertEntry(tree, 15);
-    RBT_InsertEntry(tree, 14);
-    RBT_InsertEntry(tree, 32);
-    RBT_InsertEntry(tree, 123);
-    RBT_InsertEntry(tree, 174);
+    srand(time(NULL));
 
     while (1) {
         unsigned int cmd;
@@ -158,6 +176,8 @@ int main(int argc, char *argv[])
         printf("\n(7) Print Preorder");
         printf("\n(8) Print Postorder");
         printf("\n(9) Display Tree");
+        printf("\n(10) Create 100 random nodes");
+        printf("\n(11) Remove all nodes randomly");
         printf("\n(0) Quit");
 
         printf("\n\nEnter Your Choice: ");
@@ -215,6 +235,14 @@ int main(int argc, char *argv[])
 
         case 9:
             RBT_DisplayTree(tree);
+            break;
+
+        case 10:
+            RBT_InsertEntriesRandomly(tree);
+            break;
+
+        case 11:
+            RBT_RemoveEntriesRandomly(tree);
             break;
 
         default:
