@@ -148,7 +148,7 @@ static void RBT_RemoveEntriesRandomly(struct RBT *tree)
 {
     struct RBT_Entry *entry;
 
-    while (tree->root) {
+    while (!RBT_IsEmpty(tree)) {
         entry = RBT_RemoveEntry(tree, rand() % 500);
         if (entry)
             RBT_DestroyEntry(entry);
@@ -165,6 +165,7 @@ int main(int argc, char *argv[])
         unsigned int cmd;
         int data;
         struct RBT_Entry *entry;
+        size_t i;
 
         printf("\n\n------- RB TREE --------\n");
         printf("\n(1) Create a node");
@@ -243,6 +244,17 @@ int main(int argc, char *argv[])
 
         case 11:
             RBT_RemoveEntriesRandomly(tree);
+            break;
+
+        case 99:
+            for (i = 0; i < 100; i++) {
+                printf("[%.3zu]", i);
+                RBT_InsertEntriesRandomly(tree);
+                printf(" - I->%s", RBT_IsEmpty(tree) ? "FAIL" : "PASS");
+                RBT_RemoveEntriesRandomly(tree);
+                printf(" / R->%s\n", !RBT_IsEmpty(tree) ? "FAIL" : "PASS");
+            }
+
             break;
 
         default:
