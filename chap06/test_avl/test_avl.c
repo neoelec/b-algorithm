@@ -103,7 +103,7 @@ static void AVL_RemoveEntriesRandomly(struct AVL *tree)
 {
     struct AVL_Entry *entry;
 
-    while (tree->root) {
+    while (!AVL_IsEmpty(tree)) {
         entry = AVL_RemoveEntry(tree, rand() % 500);
         if (entry)
             AVL_DestroyEntry(entry);
@@ -120,6 +120,7 @@ int main(int argc, char *argv[])
         unsigned int cmd;
         int data;
         struct AVL_Entry *entry;
+        size_t i;
 
         printf("\n\n------- AVL TREE --------\n");
         printf("\n(1) Create a node");
@@ -192,6 +193,17 @@ int main(int argc, char *argv[])
 
         case 11:
             AVL_RemoveEntriesRandomly(tree);
+            break;
+
+        case 99:
+            for (i = 0; i < 100; i++) {
+                printf("[%.3zu]", i);
+                AVL_InsertEntriesRandomly(tree);
+                printf(" - I->%s", AVL_IsEmpty(tree) ? "FAIL" : "PASS");
+                AVL_RemoveEntriesRandomly(tree);
+                printf(" / R->%s\n", !AVL_IsEmpty(tree) ? "FAIL" : "PASS");
+            }
+
             break;
 
         default:
